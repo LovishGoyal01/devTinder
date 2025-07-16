@@ -1,0 +1,19 @@
+{
+  "name": "devtinder-beckend",
+  "version": "1.0.0",
+  "description": "DevTinder-Backend",
+  "main": "index.js",
+  "scripts": {
+    "start":"node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "author": "Lovish Goyal",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
