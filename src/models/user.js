@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
     firstName:{
@@ -16,10 +17,15 @@ const userSchema = new mongoose.Schema({
         unique:true,
         lowercase:true,
         trim:true,
+        validate(value){
+           if(!validator.isEmail(value)){
+            throw new Error("Not valid email");
+           }
+        },
     },
     password:{
         type:String,
-        required:true,
+        required:true,  
     },
     age:{
         type:Number,
@@ -37,7 +43,12 @@ const userSchema = new mongoose.Schema({
     },
     photoURL:{
         type:String,
-        default:"https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg"
+        default:"https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg",
+        validate(value){
+           if(!validator.isURL(value)){
+            throw new Error("Not valid photoURL");
+           }
+        }   
     },
     about:{
        type:String,

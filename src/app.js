@@ -1,6 +1,8 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const bycrypt = require("bcrypt");
+const {validSignUpdata} = require("./utils/validation");
 
 const app = express();
 
@@ -8,13 +10,48 @@ app.use(express.json());
 
 app.post("/signup" , async (req,res) => {
  
-    const user=new User(req.body);
+   try{
+      validSignUpdata(req);
+   const {firstName,lastName,emailId,password} = req.body;
 
-    try{
+    const passwordHash = await bycrypt.hash(password,10);
+
+    const user=new User({
+        firstName,
+        lastName,
+        emailId,
+        password:passwordHash,
+    });
+
+    
      await user.save();
      res.send("User added successfullly");
     } catch(err){
-       res.status(400).send("Error Occured")
+       res.status(400).send("Error : "+ err.message);
+      }
+})
+
+app.post("/login" , async (req,res) => {
+ 
+   try{
+      const {emailId,password} = req.body;
+    
+      const user = await User.findOne({emailId:emailId});
+
+      if(!user){
+            res.send("Invalid Credentials");
+        } 
+
+      const isPasswordValid = await bycrypt.compare(password , user.password)  
+
+       if(!isPasswordValid){
+          res.send("Invalid Credentials");
+       }
+
+      res.send("Thanks For Login"); 
+
+    } catch(err){
+       res.status(400).send("Error : "+ err.message);
       }
 })
 
@@ -30,7 +67,7 @@ app.get("/user",async (req,res)=>{
     }
     catch(err)
      {
-       res.status(400).send("Error Occured") 
+       res.status(400).send("Error : "+ err.message); 
      }
 
 });
@@ -46,7 +83,7 @@ app.get("/feed",async (req,res)=>{
     }
     catch(err)
      {
-       res.status(400).send("Error Occured") 
+       res.status(400).send("Error : "+ err.message);
      }
 
 });
@@ -57,7 +94,7 @@ app.delete("/user", async (req,res)=>{
      await User.findByIdAndDelete(userid);
      res.send("User Deleted Successfully");
     }catch(err){
-       res.status(400).send("Error Occured")
+       res.status(400).send("Error : "+ err.message);
       }
 
 })
@@ -76,7 +113,7 @@ app.patch("/user/:userID", async (req,res)=>{
      await User.findByIdAndUpdate({ _id : userid},data,{runValidators:true});
      res.send("User Updated Successfully");
     }catch(err){
-       res.status(400).send("Error Occured")
+       res.status(400).send("Error : "+ err.message);
       }
 
 })
@@ -90,5 +127,5 @@ connectDB()
     })
  })
  .catch(()=>{
-     console.error("Error Occured");
+     res.status(400).send("Error : "+ err.message);
  });
