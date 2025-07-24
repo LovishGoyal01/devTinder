@@ -37,7 +37,6 @@ const userSchema = new mongoose.Schema({
     },
     gender:{
         type:String,
-        lowercase:true,
         enum:{
             values : ["male","female","others"],
             message : `{Value} is not valid gender type`
@@ -45,7 +44,7 @@ const userSchema = new mongoose.Schema({
     },
     photoURL:{
         type:String,
-        default:"https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg",
+        default:"https://static.vecteezy.com/system/resources/previews/036/594/092/original/man-empty-avatar-photo-placeholder-for-social-networks-resumes-forums-and-dating-sites-male-and-female-no-photo-images-for-unfilled-user-profile-free-vector.jpg",
         validate(value){
            if(!validator.isURL(value)){
             throw new Error("Not valid photoURL");
@@ -55,6 +54,11 @@ const userSchema = new mongoose.Schema({
     about:{
        type:String,
        default:"This is default about of user",
+       validate(value){
+        if(value.length > 125){
+            throw new Error("Short the about")
+        }
+       }
     },
     skills:{
         type: [String],
